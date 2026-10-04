@@ -281,7 +281,7 @@ ul,ol{margin:0;padding:0;list-style:none;}
   content:"";position:absolute;left:4px;top:.62em;width:8px;height:8px;border-radius:2px;transform:rotate(45deg);
   background:var(--cyan);
 }
-.card--list:nth-child(2) li::before{background:var(--rose);}
+.card--list:nth-child(2) li::before{background:#10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);}
 
 /* ------------------------------- spec strip ------------------------------ */
 .spec-strip{
@@ -801,3 +801,4 @@ input[type=range]::-moz-range-thumb{
 .rp-active + .rp-label {
   fill: var(--cyan);
 }
+

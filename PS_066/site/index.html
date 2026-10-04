@@ -471,27 +471,38 @@
           <p style="margin-top:15px; font-size:0.9rem; color:var(--txt-2); padding: 0 12px;">Note: With only 15 depth levels, and wide gaps below 130 m, both quantities are approximate. Peak heat content values are underestimated.</p>
         </div>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+        
+        <div class="card reveal" style="padding:15px; text-align:center; margin-bottom: 24px;">
+          <a href="assets/Cell_B.png" target="_blank" rel="noopener">
+            <img src="assets/Cell_B.png" alt="Predicted against reference 26 °C isotherm depth and heat content, with heat content maps for one test day" style="max-width:100%; height:auto; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
+          </a>
+          <p style="font-size:0.85rem; color:var(--txt-2);">Left: predicted against reference. Right: heat content maps for one test day.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: stretch;">
           <div class="card reveal" style="padding:15px; text-align:center; display:flex; flex-direction:column;">
-            <div style="margin-top:auto;">
-              <img src="assets/Cell_B.png" alt="Predicted against reference 26 °C isotherm depth and heat content, with heat content maps for one test day" style="width:100%; height:200px; object-fit:contain; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
-              <p style="font-size:0.85rem; color:var(--txt-2);">Left: predicted against reference. Right: heat content maps for one test day.</p>
+            <div style="min-height: 180px; display: flex; flex-direction: column; justify-content: flex-start;">
+              <h3 style="font-size: 1.1rem; margin-bottom: 8px;">What the model relies on</h3>
+              <p style="font-size: 0.9rem; color: var(--txt-2); margin-bottom: 12px;">Shuffling sea surface temperature raised the error most in the top 30 m. Shuffling sea surface height raised it most between about 80 and 190 m, with the largest effect near 131 m. Salinity and the currents mattered little in this setup. The inputs are correlated, so this split is approximate.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; flex-grow:1; justify-content:flex-start;">
+              <a href="assets/Cell_C1.png" target="_blank" rel="noopener">
+                <img src="assets/Cell_C1.png" alt="Heatmap of the increase in error when each input is shuffled, by depth" style="width:100%; height:auto; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
+              </a>
+              <p style="font-size:0.85rem; color:var(--txt-2); margin-top: auto;">Increase in error when each input is shuffled, by depth.</p>
             </div>
           </div>
+          
           <div class="card reveal" style="padding:15px; text-align:center; display:flex; flex-direction:column;">
-            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">What the model relies on</h3>
-            <p style="font-size: 0.9rem; color: var(--txt-2); margin-bottom: 12px;">Shuffling sea surface temperature raised the error most in the top 30 m. Shuffling sea surface height raised it most between about 80 and 190 m, with the largest effect near 131 m. Salinity and the currents mattered little in this setup. The inputs are correlated, so this split is approximate.</p>
-            <div style="margin-top:auto;">
-              <img src="assets/Cell_C1.png" alt="Heatmap of the increase in error when each input is shuffled, by depth" style="width:100%; height:200px; object-fit:contain; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
-              <p style="font-size:0.85rem; color:var(--txt-2);">Increase in error when each input is shuffled, by depth.</p>
+            <div style="min-height: 180px; display: flex; flex-direction: column; justify-content: flex-start;">
+              <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Where errors are larger</h3>
+              <p style="font-size: 0.9rem; color: var(--txt-2); margin-bottom: 12px;">Error near 90 m was somewhat higher in the lowest-salinity quarter of cells, and higher where the sea surface height anomaly was weak. The groups overlap and the evidence is limited, so we do not treat it as confirmation of a freshwater-layer effect.</p>
             </div>
-          </div>
-          <div class="card reveal" style="padding:15px; text-align:center; display:flex; flex-direction:column;">
-            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Where errors are larger</h3>
-            <p style="font-size: 0.9rem; color: var(--txt-2); margin-bottom: 12px;">Error near 90 m was somewhat higher in the lowest-salinity quarter of cells, and higher where the sea surface height anomaly was weak. The groups overlap and the evidence is limited, so we do not treat it as confirmation of a freshwater-layer effect.</p>
-            <div style="margin-top:auto;">
-              <img src="assets/Cell_C2.png" alt="Error by depth for subsets of cells" style="width:100%; height:200px; object-fit:contain; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
-              <p style="font-size:0.85rem; color:var(--txt-2);">Error by depth for subsets of cells. Groups overlap; evidence is limited.</p>
+            <div style="display:flex; flex-direction:column; flex-grow:1; justify-content:flex-start;">
+              <a href="assets/Cell_C2.png" target="_blank" rel="noopener">
+                <img src="assets/Cell_C2.png" alt="Error by depth for subsets of cells" style="width:100%; height:auto; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
+              </a>
+              <p style="font-size:0.85rem; color:var(--txt-2); margin-top: auto;">Error by depth for subsets of cells. Groups overlap; evidence is limited.</p>
             </div>
           </div>
         </div>

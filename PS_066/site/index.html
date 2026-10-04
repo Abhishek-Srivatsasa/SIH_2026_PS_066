@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="OceanEmbed reconstructs 15 subsurface ocean depth levels (0.5 m to 902 m) from surface satellite fields using a deep U-Net encoder-decoder. Smart India Hackathon 2026 - PS 26066, INCOIS.">
+  <meta name="theme-color" content="#04070f">
+  <title>OceanEmbed | Seeing 900 m Below the Surface - SIH 2026</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- ================= Ambient background ================= -->
+  <div class="bg" aria-hidden="true">
+    <canvas id="bgCanvas"></canvas>
+    <div class="bg-au" data-au="cyan"></div>
+    <div class="bg-au" data-au="violet"></div>
+    <div class="bg-au" data-au="teal"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-vignette"></div>
+  </div>
+  <div class="scroll-progress" aria-hidden="true"><span id="scrollBar"></span></div>
+
+  <!-- ================= Navigation ================= -->
+  <header class="nav" id="top">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="OceanEmbed home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" width="36" height="36">
+            <defs>
+              <linearGradient id="bm" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#7dd3fc" />
+                <stop offset="1" stop-color="#2dd4bf" />
+              </linearGradient>
+            </defs>
+            <circle cx="20" cy="20" r="18.5" fill="none" stroke="url(#bm)" stroke-width="1.4" opacity=".55" />
+            <ellipse cx="20" cy="11" rx="13" ry="4.2" fill="none" stroke="url(#bm)" stroke-width="1.5" opacity=".95" />
+            <ellipse cx="20" cy="20" rx="13" ry="4.2" fill="none" stroke="url(#bm)" stroke-width="1.5" opacity=".7" />
+            <ellipse cx="20" cy="29" rx="13" ry="4.2" fill="none" stroke="url(#bm)" stroke-width="1.5" opacity=".45" />
+            <circle cx="20" cy="20" r="2.6" fill="#7dd3fc" />
+          </svg>
+        </span>
+        <span class="brand-text">
+          <strong>Ocean<em>Embed</em></strong>
+          <small>Team SANKALP &middot; #777</small>
+        </span>
+      </a>
+
+      <nav class="nav-links" id="navLinks">
+        <a href="#mission">Mission</a>
+        <a href="#explorer">Depth Explorer</a>
+        <a href="#results">Results</a>
+        <a href="#compare">Compare</a>
+        <a href="#pipeline">Architecture</a>
+        <a href="#scope">Scope</a>
+      </nav>
+
+      <div class="nav-cta">
+        <a class="btn btn-ghost" href="assets/whitepaper.docx" download>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round">
+            <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16" />
+          </svg>
+          Whitepaper
+        </a>
+        <a class="btn btn-solid" href="#explorer">Launch Explorer</a>
+        <button class="nav-burger" id="navBurger" aria-label="Toggle navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+
+  <main>
+    <!-- ================= Hero ================= -->
+    <section class="hero" id="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div class="hero-badge reveal">
+          <span class="dot"></span>
+          TEAM SANKALP#777 &nbsp;&middot;&nbsp; INCOIS / MoES
+        </div>
+
+        <h1 class="hero-title reveal" data-delay="60">
+          See <span class="grad">900 metres</span><br>
+          below the surface
+        </h1>
+
+        <p class="hero-sub reveal" data-delay="140">
+          OceanEmbed is a deep U-Net encoder&ndash;decoder that turns five surface ocean fields
+          into the full <strong>15-layer subsurface temperature column</strong> &mdash; a virtual
+          sensor array where no float can swim.
+        </p>
+
+        <div class="hero-rotator reveal" data-delay="200">
+          <span class="rot-static">Reconstructing</span>
+          <span class="rot-track" id="rotTrack"></span>
+        </div>
+
+        <div class="hero-actions reveal" data-delay="260">
+          <a class="btn btn-solid btn-lg" href="#explorer">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2 2 7l10 5 10-5-10-5Z" />
+              <path d="m2 17 10 5 10-5" />
+              <path d="m2 12 10 5 10-5" />
+            </svg>
+            Explore the 15-layer stack
+          </a>
+          <a class="btn btn-outline btn-lg" href="#results">See held-out results</a>
+        </div>
+
+        <div class="hero-stats reveal" data-delay="320">
+          <div class="hstat">
+            <div class="hstat-v"><span class="count" data-count="15">0</span></div>
+            <div class="hstat-k">Depth levels</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-v"><span class="count" data-count="902">0</span><i>m</i></div>
+            <div class="hstat-k">Deepest layer</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-v"><span class="count" data-count="0.98" data-dec="2">0</span><i>&deg;C</i></div>
+            <div class="hstat-k">RMSE @ 130 m</div>
+          </div>
+          <div class="hstat">
+            <div class="hstat-v"><span class="count" data-count="49">0</span><i>%</i></div>
+            <div class="hstat-k">Below baseline</div>
+          </div>
+        </div>
+
+        <div class="scroll-cue" aria-hidden="true"><span></span>scroll to dive</div>
+      </div>
+      <div class="hero-fade" aria-hidden="true"></div>
+    </section>
+
+
+    <!-- ================= Mission ================= -->
+    <section class="section" id="mission">
+      <div class="container">
+        <div class="sec-head reveal">
+          <div class="eyebrow">The blind spot</div>
+          <h2 class="sec-title">Satellites see the skin. <span class="grad">Heat lives below.</span></h2>
+          <p class="sec-lead">
+            Ocean heat content, cyclone intensification, marine heatwaves and fisheries all depend on
+            what happens in the top few hundred metres. Yet Earth observation only reads the surface,
+            and Argo floats sample sparsely in space and time. The Indian Ocean &mdash; home to a
+            population of 1.4 billion &mdash; has the largest such blind spot in the world.
+          </p>
+        </div>
+
+        <div class="grid-3">
+          <article class="card reveal" data-delay="0">
+            <div class="card-ico" data-tone="rose">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                stroke-linecap="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 8v4m0 4h.01" />
+              </svg>
+            </div>
+            <h3>The challenge</h3>
+            <p>Only SST, SSS, sea-surface height and currents are measured globally. The 3-D thermal
+              structure beneath &mdash; the part that drives cyclones &mdash; is invisible to orbiters.</p>
+            <div class="card-tags"><span>In-situ gaps</span><span>Sparse Argo</span><span>Cloud cover</span></div>
+          </article>
+
+          <article class="card reveal" data-delay="90">
+            <div class="card-ico" data-tone="cyan">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2 2 7l10 5 10-5-10-5Z" />
+                <path d="m2 12 10 5 10-5" />
+                <path d="m2 17 10 5 10-5" />
+              </svg>
+            </div>
+            <h3>Our approach</h3>
+            <p>A U-Net convolution encoder&ndash;decoder learns the surface&rarr;subsurface mapping and
+              emits all 15 standard depth levels in one forward pass &mdash; an operational-grade
+              virtual sensor.</p>
+            <div class="card-tags"><span>U-Net CNN</span><span>15 depth heads</span><span>Skip links</span></div>
+          </article>
+
+          <article class="card reveal" data-delay="180">
+            <div class="card-ico" data-tone="amber">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 3v18h18" />
+                <path d="m7 14 4-4 3 3 5-6" />
+              </svg>
+            </div>
+            <h3>Why it wins</h3>
+            <p>It beats a strong temporal-climatology baseline by roughly half the error at the
+              thermocline, while preserving mesoscale eddy structure and anomaly correlation of 0.90.</p>
+            <div class="card-tags"><span>&minus;49% RMSE</span><span>ACC 0.90</span><span>61-day holdout</span></div>
+          </article>
+        </div>
+
+        <div class="spec-strip reveal">
+          <div class="spec"><span class="spec-k">Problem Statement</span><span class="spec-v">PS 26066</span></div>
+          <div class="spec"><span class="spec-k">Ministry</span><span class="spec-v">MoES &middot; INCOIS</span></div>
+          <div class="spec"><span class="spec-k">Domain</span><span class="spec-v">Bay of Bengal</span></div>
+          <div class="spec"><span class="spec-k">Source</span><span class="spec-v">GLORYS12V1</span></div>
+          <div class="spec"><span class="spec-k">Grid</span><span class="spec-v">0.25&deg; &middot; 40&times;40</span>
+          </div>
+          <div class="spec"><span class="spec-k">Holdout</span><span class="spec-v">61 days</span></div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================= Explorer ================= -->
+    <section class="section section-explorer" id="explorer">
+      <div class="container-wide">
+        <div class="sec-head center reveal">
+          <div class="eyebrow accent">Interactive reconstruction</div>
+          <h2 class="sec-title">The <span class="grad">15-layer</span> depth stack</h2>
+          <p class="sec-lead">
+            Every sheet is one standard depth level of the temperature field.
+            Grab it, orbit it, pull the layers apart, and drop your cursor onto any cell to read it.
+          </p>
+        </div>
+
+        <div class="toolbar reveal" id="toolbar">
+          <div class="tb-group" id="dayChips" role="group" aria-label="Select day">
+            <span class="tb-label">Day</span>
+          </div>
+          <div class="tb-group" id="fieldToggle" role="group" aria-label="Select field">
+            <span class="tb-label">Field</span>
+            <button class="chip is-on" data-field="pred">Prediction</button>
+            <button class="chip" data-field="truth">GLORYS truth</button>
+            <button class="chip" data-field="err">|Error|</button>
+          </div>
+          <div class="tb-group" role="group" aria-label="Colour scale">
+            <span class="tb-label">Scale</span>
+            <button class="chip is-on" id="scaleAuto">Per-depth</button>
+            <button class="chip" id="scaleGlobal">Global</button>
+          </div>
+          <div class="tb-spacer"></div>
+          <button class="btn btn-ghost btn-sm" id="btnPlay">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            Sweep
+          </button>
+          <button class="btn btn-ghost btn-sm" id="btnAuto">Auto-rotate</button>
+          <button class="btn btn-ghost btn-sm" id="btnReset">Reset</button>
+        </div>
+
+        <div class="explorer-grid">
+          <div class="stage-wrap reveal">
+            <div class="stage" id="stage">
+              <canvas id="stackCanvas"></canvas>
+              <div class="stage-hud">
+                <div class="hud-item"><span id="hudDepth">0.5</span><small>m depth</small></div>
+                <div class="hud-item"><span id="hudTemp">&mdash;</span><small>&deg;C</small></div>
+              </div>
+              <div class="stage-hint" id="stageHint">drag to orbit &middot; scroll to zoom &middot; hover a sheet</div>
+              <div class="stage-tip" id="stageTip" hidden></div>
+              <div class="axis-label" id="axisLabel">0.5 &rarr; 902 m</div>
+            </div>
+
+            <div class="stage-controls">
+              <div class="slider-row">
+                <label for="explode">Layer spacing</label>
+                <input type="range" id="explode" min="0" max="100" value="16">
+                <output id="explodeOut" for="explode">16%</output>
+              </div>
+              <div class="depth-rail" id="depthRail" role="group" aria-label="Depth levels"></div>
+            </div>
+          </div>
+
+          <aside class="readout reveal" data-delay="80">
+            <div class="ro-head">
+              <div>
+                <div class="ro-label">Selected layer</div>
+                <div class="ro-depth"><span id="roDepth">0.5</span><small>m</small></div>
+              </div>
+              <div class="ro-badge" id="roField">Prediction</div>
+            </div>
+
+            <div class="ro-temp">
+              <span id="roTemp">&mdash;</span><small>&deg;C &middot; layer mean</small>
+              <div class="ro-range" id="roRange">&mdash;</div>
+            </div>
+
+            <div class="ro-metrics">
+              <div class="ro-m"><span class="ro-mk">RMSE</span><span class="ro-mv" id="roRMSE">&mdash;</span></div>
+              <div class="ro-m"><span class="ro-mk">Bias</span><span class="ro-mv" id="roBias">&mdash;</span></div>
+              <div class="ro-m"><span class="ro-mk">Anomaly corr.</span><span class="ro-mv" id="roACC">&mdash;</span>
+              </div>
+              <div class="ro-m"><span class="ro-mk">Baseline RMSE</span><span class="ro-mv" id="roBase">&mdash;</span>
+              </div>
+            </div>
+
+            <div class="legend-block">
+              <div class="legend-head"><span id="legendTitle">Temperature</span><span id="legendRange">&mdash;</span>
+              </div>
+              <div class="legend-bar" id="legendBar"></div>
+              <div class="legend-ticks" id="legendTicks"></div>
+            </div>
+
+            <div class="mini-wrap">
+              <div class="mini-head"><span>Plan view @ selected depth</span><span id="miniCoord">&mdash;</span></div>
+              <canvas id="sliceCanvas" width="360" height="300"></canvas>
+            </div>
+          </aside>
+        </div>
+
+        <div class="profile-grid">
+          <div class="panel reveal">
+            <div class="panel-head">
+              <div>
+                <h3>Vertical profile</h3>
+                <p>Temperature versus depth at the point under your cursor on the stack.</p>
+              </div>
+            </div>
+            <canvas id="profileCanvas" width="700" height="360"></canvas>
+          </div>
+          <div class="panel reveal" data-delay="80">
+            <div class="panel-head">
+              <div>
+                <h3>Depth &times; longitude cross-section</h3>
+                <p>Thermal structure sliced along the selected latitude.</p>
+              </div>
+              <div class="seg" id="latSeg"></div>
+            </div>
+            <canvas id="sectionCanvas" width="700" height="360"></canvas>
+          </div>
+        </div>
+
+        <p class="data-note">
+          Interactive views stream a 5-day subset of the 61-day held-out window so the browser stays at
+          full frame-rate. The headline metrics below are computed over the complete holdout.
+        </p>
+      </div>
+    </section>
+
+
+    <!-- ================= Results ================= -->
+    <section class="section" id="results">
+      <div class="container-wide">
+        <div class="sec-head center reveal">
+          <div class="eyebrow accent">Held-out evaluation</div>
+          <h2 class="sec-title">61 unseen days. <span class="grad">Every depth.</span></h2>
+          <p class="sec-lead">
+            January&ndash;April 2021 trains the network. May&ndash;June 2021 is never seen in training &mdash;
+            and that is the only window used here.
+          </p>
+        </div>
+
+        <div class="kpi-row reveal">
+          <div class="kpi">
+            <div class="kpi-ico">&#9679;</div>
+            <div class="kpi-v"><span class="count" data-count="0.98" data-dec="2">0</span><i>&deg;C</i></div>
+            <div class="kpi-k">RMSE at 130.7 m</div>
+            <div class="kpi-bar"><span style="--w:63%"></span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-ico">&#9650;</div>
+            <div class="kpi-v"><span class="count" data-count="1.91" data-dec="2">0</span><i>&deg;C</i></div>
+            <div class="kpi-k">Baseline RMSE</div>
+            <div class="kpi-bar"><span style="--w:100%"></span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-ico">&#8722;</div>
+            <div class="kpi-v"><span class="count" data-count="49">0</span><i>%</i></div>
+            <div class="kpi-k">Error reduction</div>
+            <div class="kpi-bar"><span style="--w:49%"></span></div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-ico">&#8776;</div>
+            <div class="kpi-v"><span class="count" data-count="0.90" data-dec="2">0</span></div>
+            <div class="kpi-k">Anomaly correlation</div>
+            <div class="kpi-bar"><span style="--w:90%"></span></div>
+          </div>
+        </div>
+
+        <div class="panel reveal chart-panel">
+          <div class="panel-head">
+            <div>
+              <h3>RMSE versus climatological baseline, by depth</h3>
+              <p>Bars: OceanEmbed &middot; outline: Jan&ndash;Apr mean baseline. Hover for exact values.</p>
+            </div>
+            <div class="chart-legend">
+              <span><i class="sw sw-model"></i>OceanEmbed</span>
+              <span><i class="sw sw-base"></i>Baseline</span>
+            </div>
+          </div>
+          <canvas id="barCanvas" width="1100" height="420"></canvas>
+          <div class="chart-tip" id="barTip" hidden></div>
+        </div>
+
+        <div class="panel reveal table-panel">
+          <div class="panel-head">
+            <div>
+              <h3>Full per-depth verification table</h3>
+              <p>RMSE, bias, baseline RMSE and anomaly correlation across all 15 standard levels.</p>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="btnCsv">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round">
+                <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16" />
+              </svg>
+              Export CSV
+            </button>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Depth (m)</th>
+                  <th>RMSE (&deg;C)</th>
+                  <th>Bias (&deg;C)</th>
+                  <th>Baseline RMSE (&deg;C)</th>
+                  <th>Anomaly corr.</th>
+                  <th>Skill vs baseline</th>
+                </tr>
+              </thead>
+              <tbody id="metricsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================= Compare ================= -->
+    <section class="section" id="compare">
+      <div class="container-wide">
+        <div class="sec-head center reveal">
+          <div class="eyebrow accent">Cell by cell</div>
+          <h2 class="sec-title">Prediction vs <span class="grad">GLORYS truth</span></h2>
+          <p class="sec-lead">
+            Drag the handle to wipe between the model output and the reference reanalysis
+            at the same depth, on the same day.
+          </p>
+        </div>
+
+        <div class="toolbar reveal">
+          <div class="tb-group">
+            <span class="tb-label">Depth</span>
+            <input type="range" id="cmpDepth" min="0" max="14" value="8">
+            <output id="cmpDepthOut" for="cmpDepth">130.7 m</output>
+          </div>
+          <div class="tb-group">
+            <span class="tb-label">Day</span>
+            <select id="cmpDay" class="select"></select>
+          </div>
+          <div class="tb-spacer"></div>
+          <div class="tb-group" role="group" aria-label="Compare mode">
+            <button class="chip is-on" id="cmpWipe">Wipe</button>
+            <button class="chip" id="cmpSplit">Side by side</button>
+          </div>
+        </div>
+
+        <div class="panel compare-panel reveal">
+          <div class="cmp-viewport" id="cmpViewport" data-mode="wipe" style="--x:50%">
+            <div class="cmp-pane">
+              <canvas id="cmpTruthCanvas" width="900" height="640"></canvas>
+              <span class="cmp-tag">GLORYS truth</span>
+            </div>
+            <div class="cmp-pane cmp-pane--pred">
+              <canvas id="cmpPredCanvas" width="900" height="640"></canvas>
+              <span class="cmp-tag">OceanEmbed</span>
+            </div>
+            <div class="cmp-handle" id="cmpHandle" tabindex="0" role="slider" aria-label="Wipe position"
+              aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"><span></span></div>
+          </div>
+          <div class="compare-foot">
+            <div class="legend-inline">
+              <div class="legend-bar" id="cmpLegendBar"></div>
+              <div class="legend-ticks" id="cmpLegendTicks"></div>
+            </div>
+            <div class="compare-stats" id="cmpStats"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================= Architecture ================= -->
+    <section class="section" id="pipeline">
+      <div class="container-wide">
+        <div class="sec-head center reveal">
+          <div class="eyebrow accent">Architecture</div>
+          <h2 class="sec-title">Five surface fields in. <span class="grad">Fifteen depths out.</span></h2>
+          <p class="sec-lead">
+            A compact U-Net: two downsampling stages, a 128-channel latent embedding, and a symmetric
+            decoder re-fused by skip connections &mdash; with a vertical-consistency penalty in the loss.
+          </p>
+        </div>
+
+        <div class="panel arch-panel reveal">
+          <svg class="arch-svg" viewBox="0 0 1200 480" role="img"
+            aria-label="U-Net architecture: five surface inputs, three encoder stages, a 128 channel latent embedding, two decoder stages and fifteen depth outputs">
+            <defs>
+              <linearGradient id="gIn" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0284c7" />
+                <stop offset="1" stop-color="#0ea5e9" />
+              </linearGradient>
+              <linearGradient id="gEnc" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0ea5e9" />
+                <stop offset="1" stop-color="#4f46e5" />
+              </linearGradient>
+              <linearGradient id="gLat" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#6366f1" />
+                <stop offset="1" stop-color="#8b5cf6" />
+              </linearGradient>
+              <linearGradient id="gDec" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#4f46e5" />
+                <stop offset="1" stop-color="#0d9488" />
+              </linearGradient>
+              <linearGradient id="gOut" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#0d9488" />
+                <stop offset="1" stop-color="#d97706" />
+              </linearGradient>
+              <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity="0.3" />
+              </filter>
+            </defs>
+
+            <text class="a-cap" x="24" y="112">SURFACE INPUTS &middot; 5 CHANNELS</text>
+            <g class="a-in">
+              <rect x="24" y="136" width="132" height="32" rx="8" /><text class="a-chip" x="90" y="157">SST</text>
+              <rect x="24" y="180" width="132" height="32" rx="8" /><text class="a-chip" x="90" y="201">SSS</text>
+              <rect x="24" y="224" width="132" height="32" rx="8" /><text class="a-chip" x="90" y="245">SSH</text>
+              <rect x="24" y="268" width="132" height="32" rx="8" /><text class="a-chip" x="90" y="289">u
+                &nbsp;current</text>
+              <rect x="24" y="312" width="132" height="32" rx="8" /><text class="a-chip" x="90" y="333">v
+                &nbsp;current</text>
+            </g>
+
+            <g class="a-flow">
+              <path d="M156 240 H 186" />
+              <path d="M294 240 H 326" />
+              <path d="M434 240 H 466" />
+              <path d="M582 240 H 622" />
+              <path d="M730 240 H 762" />
+              <path d="M870 240 H 902" />
+              <path d="M1002 240 H 1036" />
+            </g>
+
+            <g filter="url(#soft)">
+              <rect class="a-node" x="190" y="170" width="104" height="140" rx="8" fill="url(#gEnc)" />
+              <rect class="a-node" x="330" y="150" width="104" height="180" rx="8" fill="url(#gEnc)" />
+              <rect class="a-node a-lat" x="470" y="130" width="112" height="220" rx="10" fill="url(#gLat)" />
+              <rect class="a-node" x="626" y="150" width="104" height="180" rx="8" fill="url(#gDec)" />
+              <rect class="a-node" x="766" y="170" width="104" height="140" rx="8" fill="url(#gDec)" />
+              <rect class="a-node" x="906" y="192" width="96" height="96" rx="8" fill="url(#gOut)" />
+            </g>
+
+            <text class="a-h" x="242" y="234">e1</text>
+            <text class="a-t" x="242" y="254">32 &times; 2</text>
+            <text class="a-h" x="382" y="234">e2</text>
+            <text class="a-t" x="382" y="254">64 &times; 2</text>
+            <text class="a-h" x="526" y="228">latent</text>
+            <text class="a-t" x="526" y="250">128 ch</text>
+            <text class="a-t" x="526" y="270">embedding</text>
+            <text class="a-h" x="678" y="234">d2</text>
+            <text class="a-t" x="678" y="254">64</text>
+            <text class="a-h" x="818" y="234">d1</text>
+            <text class="a-t" x="818" y="254">32</text>
+            <text class="a-h" x="954" y="236">head</text>
+            <text class="a-t" x="954" y="256">1 &times; 1</text>
+            <text class="a-cap" x="1040" y="52">SUBSURFACE OUTPUT &middot; 15 LEVELS</text>
+            <g class="a-out">
+              <rect x="1040" y="64" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="76">0.5 m</text>
+              <rect x="1040" y="88" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="100">5.1 m</text>
+              <rect x="1040" y="112" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="124">9.6 m</text>
+              <rect x="1040" y="136" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="148">18.5
+                m</text>
+              <rect x="1040" y="160" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="172">29.4
+                m</text>
+              <rect x="1040" y="184" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="196">47.4
+                m</text>
+              <rect x="1040" y="208" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="220">77.9
+                m</text>
+              <rect x="1040" y="232" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="244">92.3
+                m</text>
+              <rect x="1040" y="256" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="268">130.7
+                m</text>
+              <rect x="1040" y="280" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="292">155.9
+                m</text>
+              <rect x="1040" y="304" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="316">186.1
+                m</text>
+              <rect x="1040" y="328" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="340">318.1
+                m</text>
+              <rect x="1040" y="352" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="364">541.1
+                m</text>
+              <rect x="1040" y="376" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="388">643.6
+                m</text>
+              <rect x="1040" y="400" width="136" height="16" rx="5" /><text class="a-mini" x="1108" y="412">902.3
+                m</text>
+            </g>
+
+            <g class="a-skip">
+              <path d="M294 186 C 430 44, 640 44, 766 186" />
+              <path d="M434 300 C 505 372, 560 372, 626 300" />
+            </g>
+            <text class="a-skiplbl" x="530" y="36">skip connection &middot; full-resolution context</text>
+            <text class="a-skiplbl" x="530" y="392">skip connection</text>
+
+            <text class="a-cap" x="450" y="452">MASKED MSE + VERTICAL CONSISTENCY GRADIENT PENALTY</text>
+          </svg>
+          <div class="arch-legend">
+            <span><i class="sw sw-in"></i>Surface inputs</span>
+            <span><i class="sw sw-enc"></i>Encoder</span>
+            <span><i class="sw sw-lat"></i>Latent embedding</span>
+            <span><i class="sw sw-dec"></i>Decoder</span>
+            <span><i class="sw sw-out"></i>Depth outputs</span>
+          </div>
+        </div>
+
+        <div class="grid-3 arch-cards">
+          <article class="card reveal">
+            <h3>Loss with vertical memory</h3>
+            <p>A masked MSE keeps land and seafloor cells out of the gradient, while a gradient
+              penalty forces the reconstructed profiles to stay vertically coherent between
+              neighbouring depths.</p>
+          </article>
+          <article class="card reveal" data-delay="90">
+            <h3>Skip-connected decoder</h3>
+            <p>Transposed convolutions upsample the 128-channel latent field, and each decoder stage
+              re-fuses the matching encoder feature map &mdash; preserving fine mesoscale fronts that
+              pooling alone would blur away.</p>
+          </article>
+          <article class="card reveal" data-delay="180">
+            <h3>Train-only normalisation</h3>
+            <p>Every channel is standardised with statistics computed <em>only</em> on January&ndash;April.
+              Nothing about the May&ndash;June holdout ever leaks into the model.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ================= Scope ================= -->
+    <section class="section" id="scope">
+      <div class="container-wide">
+        <div class="sec-head center reveal">
+          <div class="eyebrow accent">Honest scope</div>
+          <h2 class="sec-title">What this prototype <span class="grad">is</span> &mdash; and <span class="grad">is
+              not</span></h2>
+          <p class="sec-lead">
+            Hackathon work earns trust when its edges are drawn clearly. So here are ours, on the record.
+          </p>
+        </div>
+
+        <div class="grid-2">
+          <div class="card card--list reveal">
+            <h3><span class="dot dot-ok"></span> Demonstrated today</h3>
+            <ul>
+              <li>A U-Net CNN mapping 5 surface fields to 15 subsurface depth levels.</li>
+              <li>Inputs derived from GLORYS12V1 reanalysis, coarsened from 1/12&deg; to 0.25&deg;.</li>
+              <li>Daily coverage, Jan&ndash;Jun 2021, over an 80&ndash;90&deg;E / 10&ndash;20&deg;N Bay of Bengal box.
+              </li>
+              <li>120 training days and 61 strictly held-out test days.</li>
+              <li>Benchmarked against a January&ndash;April temporal-mean baseline at every cell and depth.</li>
+            </ul>
+          </div>
+
+          <div class="card card--list reveal" data-delay="90">
+            <h3><span class="dot dot-no"></span> Not yet claimed</h3>
+            <ul>
+              <li>Not a Vision Transformer architecture.</li>
+              <li>Not conditioned on geographic basin or salinity-derived stratification.</li>
+              <li>Not yet validated against in-situ ARGO float profiles.</li>
+              <li>Not covering the Arabian Sea or the full North Indian Ocean domain.</li>
+              <li>Not an operational near-real-time forecasting system.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="roadmap reveal">
+          <h3 class="roadmap-title">What comes next</h3>
+          <ol class="timeline">
+            <li class="tl-item"><span class="tl-k">Next</span>
+              <h4>Real satellite inputs</h4>
+              <p>Move from reanalysis surface fields to OSTIA SST, SMAP/SMOS SSS, DUACS SSH, OSCAR currents and
+                CCMP/ASCAT wind stress.</p>
+            </li>
+            <li class="tl-item"><span class="tl-k">Then</span>
+              <h4>In-situ ARGO validation</h4>
+              <p>Direct verification against independent ARGO profiles from the INCOIS Live Access Server.</p>
+            </li>
+            <li class="tl-item"><span class="tl-k">Then</span>
+              <h4>Domain expansion</h4>
+              <p>Broaden to the full North Indian Ocean, 5&deg;N&ndash;30&deg;N and 45&deg;E&ndash;105&deg;E, with basin
+                conditioning.</p>
+            </li>
+            <li class="tl-item"><span class="tl-k">Scale</span>
+              <h4>ViT benchmark &amp; service</h4>
+              <p>Benchmark spatial-attention transformers against the CNN backbone and expose a near-real-time inference
+                API.</p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container-wide">
+      <div class="foot-main">
+        <div class="foot-brand">
+          <div class="foot-logo">Ocean<em>Embed</em></div>
+          <p>A deep-learning virtual sensor for the Indian Ocean's hidden heat. Built for
+            Smart India Hackathon 2026, Problem Statement 26066.</p>
+        </div>
+        <div class="foot-col">
+          <h5>Team</h5>
+          <p>Team SANKALP &middot; #777</p>
+          <p>Ministry of Earth Sciences &middot; INCOIS</p>
+        </div>
+        <div class="foot-col">
+          <h5>Resources</h5>
+          <a href="assets/whitepaper.docx" download>Whitepaper (.docx)</a>
+          <a href="#explorer">Interactive depth explorer</a>
+          <a href="#results">Held-out metrics</a>
+        </div>
+        <div class="foot-col">
+          <h5>Data</h5>
+          <p>Copernicus Marine GLORYS12V1</p>
+          <p>Bay of Bengal &middot; 2021</p>
+          <button class="btn btn-ghost btn-sm" id="btnCsvFoot">Export sample CSV</button>
+        </div>
+      </div>
+      <div class="foot-base">
+        <span>&copy; 2026 OceanEmbed &mdash; Team SANKALP #777.</span>
+        <span>Rendered fully offline &middot; no external data at runtime.</span>
+      </div>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" aria-label="Back to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round">
+      <path d="M12 19V5m0 0-6 6m6-6 6 6" />
+    </svg>
+  </button>
+
+  <script src="data/oceanembed-data.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

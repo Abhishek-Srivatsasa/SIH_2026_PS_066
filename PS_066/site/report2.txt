@@ -1,0 +1,11 @@
+APPLIED:
+[Item 2: The challenge] OLD -> NEW applied.
+[Item 9: Future Scope check] OLD -> NEW applied.
+[Item 12] Added Beyond temperature section
+
+NOT FOUND:
+Item 1: 1.4 billion sentence
+Item 4b: How it performs paragraph
+Item 4c: How it performs tags
+Item 8: Train-only normalisation
+Item 13: Nav link

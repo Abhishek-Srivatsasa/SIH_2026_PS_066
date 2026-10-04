@@ -1,0 +1,22 @@
+APPLIED:
+[Item 3: operational-grade] OLD -> NEW applied.
+[Item 4: Why it wins -> How it performs (Wait, let me just try replacing the strings individually)] OLD -> NEW applied.
+[Item 5: Below baseline] OLD -> NEW applied.
+[Item 6a: climatological baseline] OLD -> NEW applied.
+[Item 7: Skip-connected decoder] OLD -> NEW applied.
+[Item 10: footer description] OLD -> NEW applied.
+[Item 11: Resources list] OLD -> NEW applied.
+[Item 11: Team SANKALP] OLD -> NEW applied.
+
+NOT FOUND:
+Item 1: 1.4 billion sentence
+Item 2: The challenge
+Item 4a: Why it wins
+Item 4b: How it performs paragraph
+Item 4c: How it performs tags
+Item 6b: strong baseline
+Item 6c: strong temporal-climatology baseline
+Item 8: Train-only normalisation
+Item 9: Future Scope
+Item 12: Cell by cell marker
+Item 13: Nav link

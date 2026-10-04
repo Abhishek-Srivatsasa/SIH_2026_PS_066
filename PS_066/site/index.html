@@ -9,8 +9,8 @@
   <meta name="theme-color" content="#04070f">
   <title>OceanEmbed | DECODE THE DEEP OCEAN - SIH 2026</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+  <!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
   <link
     href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap"
     rel="stylesheet">
@@ -58,6 +58,7 @@
         <a href="#mission">Mission</a>
         <a href="#explorer">Depth Explorer</a>
         <a href="#results">Results</a>
+        <a href="#beyond">Beyond temperature</a>
         <a href="#compare">Compare</a>
         <a href="#pipeline">Architecture</a>
         <a href="#scope">Scope</a>
@@ -136,7 +137,7 @@
           </div>
           <div class="hstat">
             <div class="hstat-v"><span class="count" data-count="49">0</span><i>%</i></div>
-            <div class="hstat-k">Below baseline</div>
+            <div class="hstat-k">Below baseline at 130.7 m</div>
           </div>
         </div>
 
@@ -169,9 +170,8 @@
               </svg>
             </div>
             <h3>The challenge</h3>
-            <p>Only SST, SSS, sea-surface height and currents are measured globally. The 3-D thermal
-              structure beneath &mdash; the part that drives cyclones &mdash; is invisible to orbiters.</p>
-            <div class="card-tags"><span>In-situ gaps</span><span>Sparse Argo</span><span>Cloud cover</span></div>
+            <p>Satellites measure SST, SSS, sea-surface height and currents at the surface. The temperature structure below is not visible to them.</p>
+            <div class="card-tags"><span>Sparse Argo</span><span>Surface-only view</span></div>
           </article>
 
           <article class="card reveal" data-delay="90">
@@ -185,8 +185,7 @@
             </div>
             <h3>Our approach</h3>
             <p>A U-Net convolution encoder&ndash;decoder learns the surface&rarr;subsurface mapping and
-              emits all 15 standard depth levels in one forward pass &mdash; an operational-grade
-              virtual sensor.</p>
+              emits all 15 standard depth levels in one forward pass &mdash; a proof-of-concept virtual sensor.</p>
             <div class="card-tags"><span>U-Net CNN</span><span>15 depth heads</span><span>Skip links</span></div>
           </article>
 
@@ -198,11 +197,9 @@
                 <path d="m7 14 4-4 3 3 5-6" />
               </svg>
             </div>
-            <h3>Why it wins</h3>
-            <p>Error is 49% below a simple seasonal-average baseline at 130.7 m, and 14% to 78% below across all 15
-              depths. Anomaly correlation is 0.90 at 130.7 m, and the model reproduces the main eddies but smooths fine
-              detail.</p>
-            <div class="card-tags"><span>&minus;49% RMSE</span><span>ACC 0.90</span><span>61-day holdout</span></div>
+            <h3>How it performs</h3>
+            <p>At 130.7 m the error is 49% below a simple seasonal-average baseline, and it is 14% to 78% below across all 15 depths. Anomaly correlation is 0.90 at 130.7 m. The model reproduces the main eddies but smooths fine detail.</p>
+            <div class="card-tags"><span>-49% RMSE at 130.7 m</span><span>ACC 0.90 at 130.7 m</span><span>61-day holdout</span></div>
           </article>
         </div>
 
@@ -214,69 +211,6 @@
           <div class="spec"><span class="spec-k">Grid</span><span class="spec-v">0.25&deg; &middot; 40&times;40</span>
           </div>
           <div class="spec"><span class="spec-k">Holdout</span><span class="spec-v">61 days</span></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= Beyond ================= -->
-    <section class="section" id="beyond">
-      <div class="container-wide">
-        <div class="section-head reveal" style="text-align: center; margin-bottom: 40px;">
-          <h2 style="font-size: 2.5rem; margin-bottom: 10px;">Beyond temperature</h2>
-          <p style="color: var(--txt-2);">Derived ocean metrics and ablation study.</p>
-        </div>
-
-        <div class="card reveal" style="margin-bottom:30px; overflow-x:auto;">
-          <table class="data-table" style="width:100%; text-align:left; border-collapse:collapse;">
-            <thead>
-              <tr style="border-bottom: 1px solid var(--line);">
-                <th style="padding: 12px;">Metric</th>
-                <th style="padding: 12px;" class="num">Model RMSE</th>
-                <th style="padding: 12px;" class="num">Baseline RMSE</th>
-                <th style="padding: 12px;" class="num">Model Corr</th>
-                <th style="padding: 12px;" class="num">Baseline Corr</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                <td style="padding: 12px;">26&deg;C Isotherm Depth</td>
-                <td style="padding: 12px;" class="num val-good">8.15 m</td>
-                <td style="padding: 12px;" class="num">15.12 m</td>
-                <td style="padding: 12px;" class="num val-good">0.84</td>
-                <td style="padding: 12px;" class="num">0.09</td>
-              </tr>
-              <tr>
-                <td style="padding: 12px;">Heat Content</td>
-                <td style="padding: 12px;" class="num val-good">18.43 kJ/cm&sup2;</td>
-                <td style="padding: 12px;" class="num">52.47 kJ/cm&sup2;</td>
-                <td style="padding: 12px;" class="num val-good">0.65</td>
-                <td style="padding: 12px;" class="num">0.14</td>
-              </tr>
-            </tbody>
-          </table>
-          <p style="margin-top:15px; font-size:0.9rem; color:var(--txt-2); padding: 0 12px;">Note: Using only 15 depth
-            levels makes heat content calculations approximate, and peak heat content is typically underestimated.</p>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-          <div class="card reveal" style="padding:15px; text-align:center;">
-            <img src="assets/Cell_B.png" alt="Predicted against reference 26C isotherm depth and heat content"
-              style="width:100%; border-radius:8px; margin-bottom:10px;">
-            <p style="font-size:0.85rem; color:var(--txt-2);">Predicted against reference 26&deg;C isotherm depth and
-              heat content</p>
-          </div>
-          <div class="card reveal" style="padding:15px; text-align:center;">
-            <img src="assets/Cell_C1.png" alt="Increase in error when each input is shuffled, by depth"
-              style="width:100%; border-radius:8px; margin-bottom:10px;">
-            <p style="font-size:0.85rem; color:var(--txt-2);">Increase in error when each input is shuffled, by depth
-            </p>
-          </div>
-          <div class="card reveal" style="padding:15px; text-align:center;">
-            <img src="assets/Cell_C2.png" alt="Error by depth for subsets of cells; groups overlap, evidence is limited"
-              style="width:100%; border-radius:8px; margin-bottom:10px;">
-            <p style="font-size:0.85rem; color:var(--txt-2);">Error by depth for subsets of cells; groups overlap,
-              evidence is limited</p>
-          </div>
         </div>
       </div>
     </section>
@@ -451,7 +385,7 @@
         <div class="panel reveal chart-panel">
           <div class="panel-head">
             <div>
-              <h3>RMSE versus climatological baseline, by depth</h3>
+              <h3>RMSE versus seasonal-average baseline, by depth</h3>
               <p>Bars: OceanEmbed &middot; outline: Jan&ndash;Apr mean baseline. Hover for exact values.</p>
             </div>
             <div class="chart-legend">
@@ -496,6 +430,67 @@
       </div>
     </section>
 
+
+    
+    <!-- ================= Beyond ================= -->
+    <section class="section" id="beyond">
+      <div class="container-wide">
+        <div class="sec-head center reveal">
+          <h2 class="sec-title" style="margin-bottom: 10px;">Beyond temperature</h2>
+          <p class="sec-lead">From every predicted profile we derived two quantities used in tropical cyclone studies: the depth of the 26 &deg;C isotherm and the heat content of the water above it. Scores are on the 61 held-out days.</p>
+        </div>
+        
+        <div class="card reveal" style="margin-bottom:30px; overflow-x:auto;">
+          <table class="data-table" style="width:100%; text-align:left; border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--line);">
+                <th style="padding: 12px;">Quantity</th>
+                <th style="padding: 12px;" class="num">OceanEmbed RMSE</th>
+                <th style="padding: 12px;" class="num">OceanEmbed correlation</th>
+                <th style="padding: 12px;" class="num">Baseline RMSE</th>
+                <th style="padding: 12px;" class="num">Baseline correlation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 12px;">26 &deg;C isotherm depth</td>
+                <td style="padding: 12px;" class="num val-good">8.15 m</td>
+                <td style="padding: 12px;" class="num val-good">0.84</td>
+                <td style="padding: 12px;" class="num">15.12 m</td>
+                <td style="padding: 12px;" class="num">0.09</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px;">Heat content above 26 &deg;C</td>
+                <td style="padding: 12px;" class="num val-good">18.43 kJ/cm&sup2;</td>
+                <td style="padding: 12px;" class="num val-good">0.65</td>
+                <td style="padding: 12px;" class="num">52.47 kJ/cm&sup2;</td>
+                <td style="padding: 12px;" class="num">0.14</td>
+              </tr>
+            </tbody>
+          </table>
+          <p style="margin-top:15px; font-size:0.9rem; color:var(--txt-2); padding: 0 12px;">Note: With only 15 depth levels, and wide gaps below 130 m, both quantities are approximate. Peak heat content values are underestimated.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+          <div class="card reveal" style="padding:15px; text-align:center;">
+            <img src="assets/Cell_B.png" alt="Predicted against reference 26 °C isotherm depth and heat content, with heat content maps for one test day" style="width:100%; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
+            <p style="font-size:0.85rem; color:var(--txt-2);">Left: predicted against reference. Right: heat content maps for one test day.</p>
+          </div>
+          <div class="card reveal" style="padding:15px; text-align:center;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">What the model relies on</h3>
+            <p style="font-size: 0.9rem; color: var(--txt-2); margin-bottom: 12px;">Shuffling sea surface temperature raised the error most in the top 30 m. Shuffling sea surface height raised it most between about 80 and 190 m, with the largest effect near 131 m. Salinity and the currents mattered little in this setup. The inputs are correlated, so this split is approximate.</p>
+            <img src="assets/Cell_C1.png" alt="Heatmap of the increase in error when each input is shuffled, by depth" style="width:100%; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
+            <p style="font-size:0.85rem; color:var(--txt-2);">Increase in error when each input is shuffled, by depth.</p>
+          </div>
+          <div class="card reveal" style="padding:15px; text-align:center;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Where errors are larger</h3>
+            <p style="font-size: 0.9rem; color: var(--txt-2); margin-bottom: 12px;">Error near 90 m was somewhat higher in the lowest-salinity quarter of cells, and higher where the sea surface height anomaly was weak. The groups overlap and the evidence is limited, so we do not treat it as confirmation of a freshwater-layer effect.</p>
+            <img src="assets/Cell_C2.png" alt="Error by depth for subsets of cells" style="width:100%; border-radius:8px; margin-bottom:10px;" loading="lazy" onerror="this.closest('figure').hidden=true">
+            <p style="font-size:0.85rem; color:var(--txt-2);">Error by depth for subsets of cells. Groups overlap; evidence is limited.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- ================= Compare ================= -->
     <section class="section" id="compare">
@@ -694,13 +689,12 @@
           <article class="card reveal" data-delay="90">
             <h3>Skip-connected decoder</h3>
             <p>Transposed convolutions upsample the 128-channel latent field, and each decoder stage
-              re-fuses the matching encoder feature map &mdash; preserving fine mesoscale fronts that
-              pooling alone would blur away.</p>
+              re-fuses the matching encoder feature map &mdash; recovering some of the fine detail that pooling removes. Fine detail is still smoothed in the output.</p>
           </article>
           <article class="card reveal" data-delay="180">
             <h3>Train-only normalisation</h3>
             <p>Every channel is standardised with statistics computed <em>only</em> on January&ndash;April.
-              Nothing about the May&ndash;June holdout ever leaks into the model.</p>
+              The May&ndash;June holdout is not used for training, for normalisation, or for choosing the best epoch.</p>
           </article>
         </div>
       </div>
@@ -841,19 +835,19 @@
       <div class="foot-main">
         <div class="foot-brand">
           <div class="foot-logo">Ocean<em>Embed</em></div>
-          <p>A deep-learning virtual sensor for the Indian Ocean's hidden heat. Built for
+          <p>A proof-of-concept deep learning model for subsurface ocean temperature. Built for
             Smart India Hackathon 2026, Problem Statement 26066.</p>
         </div>
         <div class="foot-col">
           <h5>TEAM</h5>
-          <p>TEAM SANKALP &middot; #777<br>Abhishek Srivatsasa, Manas Bhalkikar, Nithish Madhav, Aditya Sai Katrapalli,
-            B. Shreya Reddy, Ishitha Tekumalla</p>
+          <p>Team SANKALP &middot; #777 &middot; [ADD: team member names]</p>
           <p>Ministry of Earth Sciences &middot; INCOIS</p>
         </div>
         <div class="foot-col">
           <h5>Resources</h5>
-          <a href="https://github.com/Abhishek-Srivatsasa/SIH-2026" target="_blank">GitHub</a>
-          <a href="https://youtube.com/" target="_blank">Video</a>
+          <a href="[ADD: repo URL]" target="_blank">Code on GitHub</a>
+          <a href="[ADD: YouTube link]" target="_blank">Prototype video</a>
+          <a href="[ADD: Colab or GitHub link]" target="_blank">Notebook</a>
           <a href="assets/whitepaper.docx" download>Whitepaper (.docx)</a>
           <a href="#explorer">Interactive depth explorer</a>
           <a href="#results">Held-out metrics</a>
